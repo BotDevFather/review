@@ -42,7 +42,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 1rem;
+            gap: 2rem;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -58,7 +58,7 @@
             transform-style: preserve-3d;
         }
         
-        /* Marquee Columns for Background */
+        /* Marquee Columns for Background - Now 3 columns */
         .background-marquee-column {
             display: flex;
             flex-direction: column;
@@ -67,6 +67,7 @@
             gap: 2rem;
             position: relative;
             flex: 1;
+            min-width: 300px;
         }
         
         /* Marquee Animation */
@@ -391,6 +392,16 @@
         }
         
         /* Responsive Design */
+        @media (max-width: 1200px) {
+            .background-marquee-container {
+                gap: 1rem;
+            }
+            
+            .background-marquee-column {
+                min-width: 250px;
+            }
+        }
+        
         @media (max-width: 1024px) {
             .database-ui {
                 grid-template-columns: 1fr;
@@ -402,6 +413,14 @@
             
             .title {
                 font-size: 2.5rem;
+            }
+            
+            .background-marquee-container {
+                gap: 0.5rem;
+            }
+            
+            .background-marquee-column {
+                min-width: 200px;
             }
         }
         
@@ -430,6 +449,11 @@
                     rotateX(10deg) 
                     rotateY(-3deg) 
                     rotateZ(5deg);
+                gap: 0.25rem;
+            }
+            
+            .background-marquee-column {
+                min-width: 150px;
             }
         }
         
@@ -442,11 +466,19 @@
                 display: block;
                 overflow-x: auto;
             }
+            
+            .background-marquee-container {
+                gap: 0.125rem;
+            }
+            
+            .background-marquee-column {
+                min-width: 120px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Background 3D Marquee -->
+    <!-- Background 3D Marquee with 3 columns -->
     <div class="background-3d-container">
         <div class="background-marquee-container">
             <!-- Column 1 (downwards) -->
@@ -463,19 +495,14 @@
                 </div>
             </div>
             
-            <!-- Column 3 (downwards) -->
+            <!-- Column 3 (downwards) - NEW THIRD COLUMN -->
             <div class="background-marquee-column">
                 <div class="background-marquee-content" id="bg-column3">
                     <!-- Cards will be inserted here by JavaScript -->
                 </div>
             </div>
             
-            <!-- Column 4 (upwards) -->
-            <div class="background-marquee-column">
-                <div class="background-marquee-content reverse" id="bg-column4">
-                    <!-- Cards will be inserted here by JavaScript -->
-                </div>
-            </div>
+            <!-- Column 4 (upwards) - REMOVED -->
         </div>
     </div>
     
@@ -595,6 +622,38 @@
             }
         ];
 
+        // Additional testimonials for the third column
+        const additionalTestimonials = [
+            {
+                name: 'Sophia Chen',
+                body: 'The 3D effect is absolutely stunning!',
+                img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'James Wilson',
+                body: 'Best background animation I have seen.',
+                img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Olivia Brown',
+                body: 'Smooth scrolling makes it perfect.',
+                img: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Ethan Taylor',
+                body: 'Perfect for showcasing user feedback.',
+                img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Isabella Martinez',
+                body: 'The responsive design is excellent.',
+                img: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
+            }
+        ];
+
+        // Combine all testimonials for variety
+        const allTestimonials = [...testimonials, ...additionalTestimonials];
+
         // Database records data
         const databaseRecords = [
             {
@@ -674,16 +733,16 @@
             `;
         }
 
-        // Initialize background marquee
+        // Initialize background marquee with 3 columns
         function initializeBackgroundMarquee() {
-            const columns = ['bg-column1', 'bg-column2', 'bg-column3', 'bg-column4'];
+            const columns = ['bg-column1', 'bg-column2', 'bg-column3'];
             
             columns.forEach(columnId => {
                 const column = document.getElementById(columnId);
-                // Create 5 copies of testimonials for seamless scrolling
+                // Create 6 copies of testimonials for seamless scrolling (increased for 3 columns)
                 let content = '';
-                for (let i = 0; i < 5; i++) {
-                    testimonials.forEach(testimonial => {
+                for (let i = 0; i < 6; i++) {
+                    allTestimonials.forEach(testimonial => {
                         content += createBackgroundTestimonialCard(testimonial);
                     });
                 }
