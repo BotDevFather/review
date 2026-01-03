@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Marquee Background</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Title and Footer Styling */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+        
+        .title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .subtitle {
+            color: #cccccc;
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #999999;
+            font-size: 0.875rem;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+        
+        /* Background 3D Container - FULL SCREEN WITH TILT */
+        .background-3d-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.7;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+        
+        .background-marquee-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%; /* Slightly taller for 3D effect */
+            transform: 
+                translateX(-5%) 
+                translateY(-10%) 
+                translateZ(-400px) 
+                rotateX(25deg) 
+                rotateY(-15deg) 
+                rotateZ(5deg);
+            transform-style: preserve-3d;
+            gap: 0;
+            perspective: 1500px;
+        }
+        
+        /* Marquee Columns for Background - WITH TILT */
+        .background-marquee-column {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100%;
+            gap: 1.5rem;
+            position: relative;
+            flex: 1;
+            min-width: 30%; /* Slightly less than 33% for spacing */
+            padding: 0 1.5rem;
+            transform-style: preserve-3d;
+        }
+        
+        /* Add depth to columns for 3D effect */
+        .background-marquee-column:nth-child(1) {
+            transform: translateZ(50px);
+        }
+        
+        .background-marquee-column:nth-child(2) {
+            transform: translateZ(0px);
+        }
+        
+        .background-marquee-column:nth-child(3) {
+            transform: translateZ(-50px);
+        }
+        
+        /* Marquee Animation */
+        @keyframes marquee-vertical-bg {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(calc(-100% - 1.5rem));
+            }
+        }
+        
+        @keyframes marquee-vertical-reverse-bg {
+            0% {
+                transform: translateY(calc(-100% - 1.5rem));
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+        
+        .background-marquee-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: marquee-vertical-bg 60s linear infinite;
+            transform-style: preserve-3d;
+        }
+        
+        .background-marquee-content.reverse {
+            animation: marquee-vertical-reverse-bg 60s linear infinite;
+        }
+        
+        /* Black and White Testimonial Cards with 3D depth */
+        .background-testimonial-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.3),
+                0 10px 20px rgba(0, 0, 0, 0.2);
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transform-style: preserve-3d;
+            transform: translateZ(20px);
+        }
+        
+        .background-testimonial-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px) translateZ(30px);
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .background-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            transform-style: preserve-3d;
+        }
+        
+        .background-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            filter: grayscale(100%);
+            transform: translateZ(10px);
+        }
+        
+        .background-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffffff, #aaaaaa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            font-weight: bold;
+            font-size: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transform: translateZ(10px);
+        }
+        
+        .background-user-details {
+            display: flex;
+            flex-direction: column;
+            transform-style: preserve-3d;
+        }
+        
+        .background-user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #ffffff;
+            transform: translateZ(5px);
+        }
+        
+        .background-testimonial-text {
+            font-size: 0.875rem;
+            color: #cccccc;
+            line-height: 1.5;
+            font-style: italic;
+            transform: translateZ(5px);
+        }
+        
+        /* Controls Section */
+        .controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+        }
+        
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            transform-style: preserve-3d;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px) translateZ(10px);
+        }
+        
+        .control-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #000000;
+            border-color: #ffffff;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .title {
+                font-size: 3.5rem;
+            }
+            
+            .background-marquee-container {
+                transform: 
+                    translateX(-3%) 
+                    translateY(-8%) 
+                    translateZ(-350px) 
+                    rotateX(22deg) 
+                    rotateY(-12deg) 
+                    rotateZ(4deg);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .title {
+                font-size: 3rem;
+            }
+            
+            .background-marquee-container {
+                transform: 
+                    translateX(-2%) 
+                    translateY(-6%) 
+                    translateZ(-300px) 
+                    rotateX(20deg) 
+                    rotateY(-10deg) 
+                    rotateZ(3deg);
+            }
+            
+            .background-marquee-column {
+                padding: 0 1rem;
+            }
+            
+            .background-testimonial-card {
+                padding: 1.25rem;
+                min-height: 130px;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                max-width: 90%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .background-marquee-container {
+                height: 130%;
+                transform: 
+                    translateX(-1%) 
+                    translateY(-5%) 
+                    translateZ(-250px) 
+                    rotateX(18deg) 
+                    rotateY(-8deg) 
+                    rotateZ(2deg);
+            }
+            
+            .background-marquee-column {
+                padding: 0 0.75rem;
+                gap: 1rem;
+            }
+            
+            .background-testimonial-card {
+                padding: 1rem;
+                min-height: 120px;
+            }
+            
+            .background-avatar,
+            .background-avatar-placeholder {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+            
+            .controls {
+                padding: 0.75rem 1rem;
+                gap: 0.5rem;
+            }
+            
+            .control-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .background-marquee-container {
+                height: 140%;
+                transform: 
+                    translateX(0%) 
+                    translateY(-4%) 
+                    translateZ(-200px) 
+                    rotateX(15deg) 
+                    rotateY(-5deg) 
+                    rotateZ(1deg);
+            }
+            
+            .background-marquee-column {
+                padding: 0 0.5rem;
+                gap: 0.75rem;
+                min-width: 32%;
+            }
+            
+            .background-testimonial-card {
+                padding: 0.75rem;
+                min-height: 110px;
+            }
+            
+            .background-user-info {
+                margin-bottom: 0.5rem;
+            }
+            
+            .background-avatar,
+            .background-avatar-placeholder {
+                width: 28px;
+                height: 28px;
+                font-size: 0.75rem;
+            }
+            
+            .background-user-name {
+                font-size: 0.75rem;
+            }
+            
+            .background-testimonial-text {
+                font-size: 0.75rem;
+                line-height: 1.4;
+            }
+            
+            .controls {
+                bottom: 1rem;
+                flex-direction: column;
+                width: 90%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .background-marquee-container {
+                height: 150%;
+                transform: 
+                    translateX(0%) 
+                    translateY(-3%) 
+                    translateZ(-150px) 
+                    rotateX(12deg) 
+                    rotateY(-3deg) 
+                    rotateZ(0deg);
+            }
+            
+            .background-testimonial-card {
+                padding: 0.5rem;
+                min-height: 100px;
+            }
+            
+            .background-avatar,
+            .background-avatar-placeholder {
+                width: 24px;
+                height: 24px;
+                font-size: 0.625rem;
+            }
+            
+            .background-user-name {
+                font-size: 0.625rem;
+            }
+            
+            .background-testimonial-text {
+                font-size: 0.625rem;
+                line-height: 1.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1 class="title">3D MARQUEE BACKGROUND</h1>
+        <p class="subtitle">Black & White Minimalist Design with Animated Testimonials</p>
+    </div>
+    
+    <!-- Background 3D Marquee - FULL SCREEN WITH TILT -->
+    <div class="background-3d-container">
+        <div class="background-marquee-container">
+            <!-- Column 1 (downwards) -->
+            <div class="background-marquee-column">
+                <div class="background-marquee-content" id="bg-column1">
+                    <!-- Cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Column 2 (upwards) -->
+            <div class="background-marquee-column">
+                <div class="background-marquee-content reverse" id="bg-column2">
+                    <!-- Cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Column 3 (downwards) -->
+            <div class="background-marquee-column">
+                <div class="background-marquee-content" id="bg-column3">
+                    <!-- Cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls">
+        <button class="control-btn" onclick="toggleAnimation()">⏸️ Pause</button>
+        <button class="control-btn" onclick="toggleDirection()">🔄 Reverse</button>
+        <button class="control-btn" onclick="changeSpeed('faster')">⚡ Faster</button>
+        <button class="control-btn" onclick="changeSpeed('slower')">🐢 Slower</button>
+        <button class="control-btn" onclick="changeSpeed('reset')">↩️ Reset</button>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <p>Black & White 3D Testimonials Marquee • Hover to pause • Interactive controls</p>
+    </div>
+
+    <script>
+        // Testimonials data for background marquee
+        const testimonials = [
+            {
+                name: 'Ava Green',
+                body: 'The minimalist design is absolutely stunning!',
+                img: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Ana Miller',
+                body: 'Perfect black and white aesthetic.',
+                img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Mateo Rossi',
+                body: 'Smooth animations in monochrome.',
+                img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Maya Patel',
+                body: 'Elegant and sophisticated design.',
+                img: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Noah Smith',
+                body: 'Best minimalist marquee I have used!',
+                img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Lucas Stone',
+                body: 'Very customizable monochrome theme.',
+                img: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Haruto Sato',
+                body: 'Impressive black and white performance!',
+                img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Emma Lee',
+                body: 'Love the grayscale hover effect!',
+                img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Carlos Ray',
+                body: 'Great for minimalist testimonials.',
+                img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Sophia Chen',
+                body: 'The 3D effect in monochrome is stunning!',
+                img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'James Wilson',
+                body: 'Best black and white animation.',
+                img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+            },
+            {
+                name: 'Olivia Brown',
+                body: 'Smooth scrolling in grayscale.',
+                img: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=150&h=150&fit=crop&crop=face'
+            }
+        ];
+
+        // Create background testimonial card HTML
+        function createBackgroundTestimonialCard(testimonial) {
+            return `
+                <div class="background-testimonial-card">
+                    <div class="background-user-info">
+                        ${testimonial.img ? 
+                            `<img src="${testimonial.img}" alt="${testimonial.name}" class="background-avatar">` : 
+                            `<div class="background-avatar-placeholder">${testimonial.name.charAt(0)}</div>`
+                        }
+                        <div class="background-user-details">
+                            <div class="background-user-name">${testimonial.name}</div>
+                        </div>
+                    </div>
+                    <p class="background-testimonial-text">"${testimonial.body}"</p>
+                </div>
+            `;
+        }
+
+        // Initialize background marquee with 3 columns
+        function initializeBackgroundMarquee() {
+            const columns = ['bg-column1', 'bg-column2', 'bg-column3'];
+            
+            columns.forEach(columnId => {
+                const column = document.getElementById(columnId);
+                // Create 6 copies of testimonials for longer scrolling
+                let content = '';
+                for (let i = 0; i < 6; i++) {
+                    testimonials.forEach(testimonial => {
+                        content += createBackgroundTestimonialCard(testimonial);
+                    });
+                }
+                column.innerHTML = content;
+            });
+        }
+
+        // Animation control variables
+        let isPaused = false;
+        let animationSpeed = 60;
+        let allReversed = false;
+
+        // Toggle animation play state
+        function toggleAnimation() {
+            isPaused = !isPaused;
+            const columns = document.querySelectorAll('.background-marquee-content, .background-marquee-content.reverse');
+            const pauseBtn = document.querySelector('.control-btn:nth-child(1)');
+            
+            columns.forEach(column => {
+                if (isPaused) {
+                    column.style.animationPlayState = 'paused';
+                } else {
+                    column.style.animationPlayState = 'running';
+                }
+            });
+            
+            pauseBtn.textContent = isPaused ? '▶️ Resume' : '⏸️ Pause';
+        }
+
+        // Toggle all directions
+        function toggleDirection() {
+            allReversed = !allReversed;
+            const columns = document.querySelectorAll('.background-marquee-content');
+            const directionBtn = document.querySelector('.control-btn:nth-child(2)');
+            
+            columns.forEach(column => {
+                if (allReversed) {
+                    column.classList.add('reverse');
+                } else {
+                    // Reset to original state (columns 1 & 3 normal, 2 reversed)
+                    const columnId = column.id;
+                    if (columnId === 'bg-column2') {
+                        column.classList.add('reverse');
+                    } else {
+                        column.classList.remove('reverse');
+                    }
+                }
+            });
+            
+            directionBtn.textContent = allReversed ? '⏫ Normal' : '⏬ Reverse';
+        }
+
+        // Change animation speed
+        function changeSpeed(action) {
+            const columns = document.querySelectorAll('.background-marquee-content, .background-marquee-content.reverse');
+            
+            switch(action) {
+                case 'faster':
+                    animationSpeed = Math.max(30, animationSpeed - 15);
+                    break;
+                case 'slower':
+                    animationSpeed = Math.min(120, animationSpeed + 15);
+                    break;
+                case 'reset':
+                    animationSpeed = 60;
+                    break;
+            }
+            
+            columns.forEach(column => {
+                column.style.animationDuration = `${animationSpeed}s`;
+            });
+            
+            // Update button text
+            const fasterBtn = document.querySelector('.control-btn:nth-child(3)');
+            const slowerBtn = document.querySelector('.control-btn:nth-child(4)');
+            fasterBtn.textContent = `⚡ ${animationSpeed <= 30 ? 'Max' : 'Faster'}`;
+            slowerBtn.textContent = `🐢 ${animationSpeed >= 120 ? 'Max' : 'Slower'}`;
+        }
+
+        // Initialize everything on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeBackgroundMarquee();
+            
+            // Enhanced 3D effect on mouse move
+            document.addEventListener('mousemove', (e) => {
+                const bgContainer = document.querySelector('.background-marquee-container');
+                const x = (e.clientX / window.innerWidth - 0.5) * 20;
+                const y = (e.clientY / window.innerHeight - 0.5) * 20;
+                
+                bgContainer.style.transform = 
+                    `translateX(-5%) 
+                     translateY(-10%) 
+                     translateZ(-400px) 
+                     rotateX(${25 + y}deg) 
+                     rotateY(${-15 + x}deg) 
+                     rotateZ(${5 + (x * 0.1)}deg)`;
+            });
+            
+            // Reset 3D effect when mouse stops moving
+            let mouseTimer;
+            document.addEventListener('mousemove', () => {
+                clearTimeout(mouseTimer);
+                mouseTimer = setTimeout(() => {
+                    const bgContainer = document.querySelector('.background-marquee-container');
+                    bgContainer.style.transform = 
+                        `translateX(-5%) 
+                         translateY(-10%) 
+                         translateZ(-400px) 
+                         rotateX(25deg) 
+                         rotateY(-15deg) 
+                         rotateZ(5deg)`;
+                }, 1000);
+            });
+            
+            // Add hover pause effect to cards
+            document.addEventListener('mouseover', (e) => {
+                if (e.target.closest('.background-testimonial-card')) {
+                    const columns = document.querySelectorAll('.background-marquee-content, .background-marquee-content.reverse');
+                    columns.forEach(column => {
+                        column.style.animationPlayState = 'paused';
+                    });
+                }
+            });
+            
+            document.addEventListener('mouseout', (e) => {
+                if (e.target.closest('.background-testimonial-card') && !isPaused) {
+                    const columns = document.querySelectorAll('.background-marquee-content, .background-marquee-content.reverse');
+                    columns.forEach(column => {
+                        column.style.animationPlayState = 'running';
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
